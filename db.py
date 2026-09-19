@@ -17,8 +17,8 @@ class Run:
         return cls(
             id=row[0],
             dttm=datetime.fromisoformat(row[1]),
-            prompt_token_usage=row[2],
-            completion_token_usage=row[3],
+            completion_token_usage=row[2],
+            prompt_token_usage=row[3],
             server_knowledge=row[4]
         )
 
