@@ -14,6 +14,7 @@ class UpdatedTransaction(BaseModel):
 class Transaction(UpdatedTransaction):
     import_payee_name_original: Optional[str]
     transfer_account_id: Optional[str]
+    amount: int
 
 
 # God help me

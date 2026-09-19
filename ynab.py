@@ -13,7 +13,7 @@ DEFAULT_HEADERS = {
 }
 
 def get_transactions(server_knowledge=None) -> tuple[list[Transaction], str]:
-    url = f'https://api.ynab.com/v1/budgets/{BUDGET_ID}/transactions?type=uncategorized'
+    url = f'https://api.ynab.com/v1/budgets/{BUDGET_ID}/transactions?type=unapproved'
     if server_knowledge:
         url += f'&last_knowledge_of_server={server_knowledge}'
     resp = requests.get(url, headers=DEFAULT_HEADERS)

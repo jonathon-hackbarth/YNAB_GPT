@@ -14,8 +14,12 @@ TransactionId = str
 
 
 def categorize_transactions(transactions: list[Transaction], categories: list[Category]) -> dict[TransactionId, Category]:
-    """Given a list of transactions and categories, categorize as many transactions as possible.
-    Returns: a dictionary of Transaction.id => Category. Not all given transactions can be paired.
+    """Given a list of transactions and categories, categorize or re-categorize as many transactions
+    as possible, including transactions that already have a category Claude disagrees with.
+    Transfers and inflows (deposits, refunds, interest, cashback) are skipped entirely, since
+    they aren't spending and have no business being forced into a spending category.
+    Returns: a dictionary of Transaction.id => Category, for transactions whose category should change.
+    Transactions Claude leaves unmatched, or already agrees with, are omitted.
     """
     category_map = {c.get_name().lower(): c for c in categories}
     categorized_transactions = {}
@@ -26,13 +30,20 @@ def categorize_transactions(transactions: list[Transaction], categories: list[Ca
         if transaction.transfer_account_id:
             continue
 
+        if transaction.amount >= 0:
+            continue
+
         if transaction.import_payee_name_original:
             claude_category = gpt.categorize(category_names, transaction.import_payee_name_original, retries=NUM_GPT_RETRIES)
 
             if claude_category not in category_map:
                 continue
 
-            categorized_transactions[transaction.id] = category_map[claude_category]
+            matched_category = category_map[claude_category]
+            if matched_category.category_id == transaction.category_id:
+                continue
+
+            categorized_transactions[transaction.id] = matched_category
     return categorized_transactions
 
 
