@@ -43,7 +43,7 @@ python main.py
 ```
 
 ## Cost
-You'll need to bring your own Anthropic API key. At the moment Claude 3.5 Sonnet is $3 / 1M input tokens, and $15 / 1M output tokens [[pricing page](https://www.anthropic.com/pricing)]. For me, each uncategorized transaction uses about ~85 input tokens, and ~2 output tokens. All things considered, very cheap.
+You'll need to bring your own Anthropic API key. This uses Claude Haiku 4.5, which is $1 / 1M input tokens, and $5 / 1M output tokens [[pricing page](https://platform.claude.com/docs/en/about-claude/pricing)] — plenty capable for single-word category classification. For me, each uncategorized transaction uses about ~85 input tokens, and ~2 output tokens. All things considered, very cheap.
 
 YNAB is 99 $/yr, and you don't pay any extra for an API key. You're rate-limited for 200 requests per hour. Each script run uses 3 requests. Meaning you can run this script every minute if you want.
 

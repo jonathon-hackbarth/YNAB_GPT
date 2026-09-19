@@ -11,7 +11,7 @@ This document details the changes made to convert this fork of [aelzeiny/YNAB_GP
 - Replaced `from openai import OpenAI` with `import anthropic`.
 - Changed client instantiation from `client = OpenAI()` to `client = anthropic.Anthropic()`.
 - Rewrote `_categorize()` to call `client.messages.create()` instead of `client.chat.completions.create()`:
-  - `model` is now `"claude-3-5-sonnet-20241022"`.
+  - `model` is now `"claude-haiku-4-5-20251001"`. Haiku is chosen over Sonnet because this task is single-word classification (~85 input / ~2 output tokens per call) — Anthropic's own guidance is to use Haiku for simple tasks and reserve Sonnet/Opus for heavier reasoning. Note: the model originally used during development, `claude-3-5-sonnet-20241022`, was retired by Anthropic on October 28, 2025 and would fail all requests; verify against [Anthropic's model deprecations page](https://platform.claude.com/docs/en/about-claude/model-deprecations) before relying on any hardcoded model string long-term.
   - Added the required `max_tokens=100` parameter (the Anthropic Messages API requires this; OpenAI's Chat Completions API does not).
   - The system prompt is passed via the top-level `system=prompt` parameter instead of a `{"role": "system", ...}` message — Claude's Messages API keeps system instructions separate from the conversational message list.
   - Only the `user` message remains in the `messages` list.
@@ -31,7 +31,7 @@ This document details the changes made to convert this fork of [aelzeiny/YNAB_GP
 - Retitled from "YNAB ChatGPT Categorizer" to "YNAB Claude Categorizer".
 - Replaced references to ChatGPT/OpenAI with Claude/Anthropic throughout.
 - Added a note crediting the original repository this was forked from.
-- Updated the Cost section with Claude 3.5 Sonnet pricing.
+- Updated the Cost section with Claude Haiku 4.5 pricing.
 - Updated Docker run/crontab examples to use `ANTHROPIC_API_KEY` instead of `OPENAI_API_KEY`.
 - Added a Setup section covering prerequisites and installation steps.
 
@@ -45,7 +45,7 @@ This document details the changes made to convert this fork of [aelzeiny/YNAB_GP
 | SDK | `openai` | `anthropic` |
 | Client | `OpenAI()` | `anthropic.Anthropic()` |
 | Call | `client.chat.completions.create()` | `client.messages.create()` |
-| Model | `gpt-3.5-turbo` | `claude-3-5-sonnet-20241022` |
+| Model | `gpt-3.5-turbo` | `claude-haiku-4-5-20251001` |
 | Max tokens | optional | required (`max_tokens`) |
 | System prompt | message with `role: "system"` | top-level `system` parameter |
 | Response text | `response.choices[0].message.content` | `response.content[0].text` |
@@ -69,12 +69,12 @@ For Docker/crontab usage, see the updated examples in [README.md](./README.md#bu
 
 ## Cost comparison
 
-| | OpenAI `gpt-3.5-turbo` (original) | Anthropic `claude-3-5-sonnet-20241022` (this fork) |
+| | OpenAI `gpt-3.5-turbo` (original) | Anthropic `claude-haiku-4-5-20251001` (this fork) |
 |---|---|---|
-| Input | $0.50 / 1M tokens | $3.00 / 1M tokens |
-| Output | $1.50 / 1M tokens | $15.00 / 1M tokens |
+| Input | $0.50 / 1M tokens | $1.00 / 1M tokens |
+| Output | $1.50 / 1M tokens | $5.00 / 1M tokens |
 
-Claude 3.5 Sonnet is more expensive per token than GPT-3.5 Turbo, but each transaction categorization uses very few tokens (~85 input, ~2 output), so the absolute cost difference is still negligible for typical personal-finance usage — a few cents per month even at frequent (e.g. every-minute cron) run cadences. If cost is a concern, consider switching `model` in `gpt.py` to a smaller/cheaper Claude model.
+Claude Haiku 4.5 is somewhat more expensive per token than GPT-3.5 Turbo, but each transaction categorization uses very few tokens (~85 input, ~2 output), so the absolute cost difference is still negligible for typical personal-finance usage — a few cents per month even at frequent (e.g. every-minute cron) run cadences. If you want higher-quality categorization and don't mind ~3x the cost, switch `model` in `gpt.py` to `claude-sonnet-4-6` ($3/$15 per 1M tokens).
 
 ## Troubleshooting
 

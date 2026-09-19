@@ -20,7 +20,7 @@ def categorize(category_names: list[str], name: str, retries: int) -> str:
 def _categorize(prompt: str, name: str) -> str:
     global usage_completion_tokens, usage_prompt_tokens, usage_total_tokens
     response = client.messages.create(
-      model="claude-3-5-sonnet-20241022",
+      model="claude-haiku-4-5-20251001",
       max_tokens=100,
       system=prompt,
       messages=[
