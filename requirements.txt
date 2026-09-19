@@ -1,4 +1,4 @@
 requests
 pydantic
-openai
+anthropic
 tqdm

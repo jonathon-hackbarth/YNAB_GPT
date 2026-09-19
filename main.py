@@ -24,12 +24,12 @@ def categorize_transactions(transactions: list[Transaction], categories: list[Ca
 
     for transaction in tqdm(transactions):
         if transaction.import_payee_name_original:
-            gpt_category = gpt.categorize(category_names, transaction.import_payee_name_original, retries=NUM_GPT_RETRIES)
+            claude_category = gpt.categorize(category_names, transaction.import_payee_name_original, retries=NUM_GPT_RETRIES)
 
-            if gpt_category == other:
+            if claude_category == other:
                 continue
 
-            categorized_transactions[transaction.id] = category_map[gpt_category]
+            categorized_transactions[transaction.id] = category_map[claude_category]
     return categorized_transactions
 
 
@@ -53,10 +53,10 @@ def main():
         if updated_transactions:
             ynab.patch_transactions(updated_transactions)
         print('updated', len(updated_transactions), 'transactions')
-        print('ChatGPT Usage:')
+        print('Claude Usage:')
         from gpt import usage_completion_tokens, usage_prompt_tokens, usage_total_tokens
-        print('\tCompletion Tokens:', usage_completion_tokens)
-        print('\tPrompt Tokens:', usage_prompt_tokens)
+        print('\tOutput Tokens:', usage_completion_tokens)
+        print('\tInput Tokens:', usage_prompt_tokens)
         print('\tTotal Tokens:', usage_total_tokens)
         store.add_run(db.Run(
             id=None,

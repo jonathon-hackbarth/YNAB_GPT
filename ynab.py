@@ -43,5 +43,4 @@ def patch_transactions(transactions: list[UpdatedTransaction]):
         headers=DEFAULT_HEADERS,
         json=dict(transactions=[t.model_dump() for t in transactions]),
     )
-    import pdb; pdb.set_trace()
     resp.raise_for_status()
