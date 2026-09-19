@@ -2,3 +2,4 @@ db.sqlite
 __pycache__
 log.txt
 .env
+.claude/settings.local.json

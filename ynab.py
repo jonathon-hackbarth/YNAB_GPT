@@ -4,7 +4,7 @@ from models import Transaction, Category, UpdatedTransaction
 import pickle
 
 
-BUDGET_ID = 'last-used'
+BUDGET_ID = '930b05f0-21ec-42c1-9371-27001fedd153'  # Hackbarth Budget (post Fresh Start, 2026-09-18)
 YNAB_API_KEY = os.environ['YNAB_API_KEY']
 DEFAULT_HEADERS = {
     'accept': 'application/json',
