@@ -23,10 +23,13 @@ def categorize_transactions(transactions: list[Transaction], categories: list[Ca
     category_names = [c.get_name().lower() for c in categories] + [other]
 
     for transaction in tqdm(transactions):
+        if transaction.transfer_account_id:
+            continue
+
         if transaction.import_payee_name_original:
             claude_category = gpt.categorize(category_names, transaction.import_payee_name_original, retries=NUM_GPT_RETRIES)
 
-            if claude_category == other:
+            if claude_category not in category_map:
                 continue
 
             categorized_transactions[transaction.id] = category_map[claude_category]
