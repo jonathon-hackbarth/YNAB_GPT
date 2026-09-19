@@ -12,11 +12,9 @@ This repo uses Claude (Anthropic's LLM) to auto-categorize transactions, and mar
 ## Instructions
 Transactions already tagged with categories will not be considered.
 
-Uncategorized transactions will attempt to be matched to Categories that fall in Category-Groups that start with "[Auto]" (case-insensitive).
+Uncategorized transactions will attempt to be matched against all of your spending categories, except the `Credit Card Payments` and `Internal Master Category` groups (and any hidden/deleted categories) — those aren't things Claude should ever assign to a purchase.
 
-![category groups that start with auto image](./docs/ynab-categories.png)
-
-In the example shown in the image, the categories eligible for auto-categorization are "Entertainment", "Dining", "Shopping", and "Gas".
+> The upstream project restricts matching to Category-Groups prefixed with `[Auto]`, so you opt in specific categories one at a time. This fork removes that restriction and makes all of your spending categories eligible by default. If you'd rather opt in categories individually instead, restore the `[Auto]`-prefix filter in `ynab.py`'s `get_categories()`.
 
 Transactions that have been auto-categorized are marked with a blue flag.
 

@@ -22,6 +22,9 @@ def get_transactions(server_knowledge=None) -> tuple[list[Transaction], str]:
     return [Transaction.model_validate(t) for t in data['transactions']], data['server_knowledge']
 
 
+NON_SPENDING_GROUPS = {'Internal Master Category', 'Credit Card Payments'}
+
+
 def get_categories() -> list[Category]:
     resp = requests.get(
         f'https://api.ynab.com/v1/budgets/{BUDGET_ID}/categories',
@@ -32,8 +35,9 @@ def get_categories() -> list[Category]:
     return [
         Category(cg['name'], c['name'], c['id'])
         for cg in categories_data['data']['category_groups']
+        if cg['name'] not in NON_SPENDING_GROUPS
         for c in cg['categories']
-        if cg['name'].startswith('[Auto]')
+        if not c.get('hidden') and not c.get('deleted')
     ]
 
 
