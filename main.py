@@ -1,3 +1,4 @@
+import argparse
 import datetime as dt
 from contextlib import closing
 from tqdm import tqdm
@@ -47,7 +48,7 @@ def categorize_transactions(transactions: list[Transaction], categories: list[Ca
     return categorized_transactions
 
 
-def main():
+def main(apply_flag=True):
     with closing(db.RunStore(DB_PATH)) as store:
         last_run = store.get_last_run()
         server_knowledge = None
@@ -57,13 +58,14 @@ def main():
         categories = ynab.get_categories()
         categorized_transactions = categorize_transactions(transactions, categories)
         updated_transactions = [
-            UpdatedTransaction.model_validate(t.model_dump()) 
+            UpdatedTransaction.model_validate(t.model_dump())
             for t in transactions if t.id in categorized_transactions
         ]
         for t in updated_transactions:
             t.category_id = categorized_transactions[t.id].category_id
-            t.flag_color = 'blue'
-        
+            if apply_flag:
+                t.flag_color = 'blue'
+
         if updated_transactions:
             ynab.patch_transactions(updated_transactions)
         print('updated', len(updated_transactions), 'transactions')
@@ -82,4 +84,10 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--no-flag', action='store_true',
+        help="Don't set the blue flag on categorized transactions (e.g. after a manual dry-run review already covered them)",
+    )
+    args = parser.parse_args()
+    main(apply_flag=not args.no_flag)
