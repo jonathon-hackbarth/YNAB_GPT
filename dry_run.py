@@ -38,12 +38,13 @@ for t in sample:
     existing_name = existing.full_name() if existing else None
 
     if t.id in results:
-        new_cat = results[t.id]
-        if existing_name is None:
-            print(f'{payee!r:50} NEW           -> {new_cat.full_name()}')
+        new_cat, is_override, source = results[t.id]
+        tag = f'[{source}]'
+        if not is_override:
+            print(f'{payee!r:50} NEW {tag:>8} -> {new_cat.full_name()}')
             new_count += 1
         else:
-            print(f'{payee!r:50} CORRECTED     {existing_name!r} -> {new_cat.full_name()!r}')
+            print(f'{payee!r:50} CORRECTED {tag:>8} {existing_name!r} -> {new_cat.full_name()!r}')
             corrected_count += 1
     elif existing_name is not None:
         confirmed_count += 1
@@ -53,7 +54,7 @@ for t in sample:
 print()
 print(f'Sample size: {len(sample)}')
 print(f'Would newly categorize (was blank): {new_count}')
-print(f'Would correct (Claude disagreed with existing category): {corrected_count}')
+print(f'Would correct (agreed twice, or a deterministic rule, disagreeing with existing category): {corrected_count}')
 print(f'Confirmed / left unchanged (already categorized, Claude agrees): {confirmed_count}')
 print(f'Left as "other" / no match: {unmatched_count}')
 print(f'Claude tokens used - input: {gpt.usage_prompt_tokens}, output: {gpt.usage_completion_tokens}')
