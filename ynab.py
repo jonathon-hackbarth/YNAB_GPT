@@ -41,6 +41,45 @@ def get_categories() -> list[Category]:
     ]
 
 
+def get_ready_to_assign_category() -> Category:
+    """The reserved 'Inflow: Ready to Assign' category YNAB puts under Internal Master Category
+    in every budget. It's excluded from get_categories() (that function only returns spending
+    categories), so income transactions need this looked up separately.
+    """
+    resp = requests.get(
+        f'https://api.ynab.com/v1/budgets/{BUDGET_ID}/categories',
+        headers=DEFAULT_HEADERS,
+    )
+    resp.raise_for_status()
+    for cg in resp.json()['data']['category_groups']:
+        if cg['name'] == 'Internal Master Category':
+            for c in cg['categories']:
+                if c['name'] == 'Inflow: Ready to Assign':
+                    return Category(cg['name'], c['name'], c['id'])
+    raise RuntimeError('Could not find the Inflow: Ready to Assign category in this budget')
+
+
+def get_all_transactions() -> list[Transaction]:
+    """Full transaction history (approved and unapproved), for matching refunds against the
+    charge they're refunding -- get_transactions() above only sees the unapproved queue.
+    """
+    resp = requests.get(
+        f'https://api.ynab.com/v1/budgets/{BUDGET_ID}/transactions',
+        headers=DEFAULT_HEADERS,
+    )
+    resp.raise_for_status()
+    return [Transaction.model_validate(t) for t in resp.json()['data']['transactions']]
+
+
+def get_accounts() -> list[dict]:
+    resp = requests.get(
+        f'https://api.ynab.com/v1/budgets/{BUDGET_ID}/accounts',
+        headers=DEFAULT_HEADERS,
+    )
+    resp.raise_for_status()
+    return [a for a in resp.json()['data']['accounts'] if not a['closed']]
+
+
 def patch_transactions(transactions: list[UpdatedTransaction]):
     resp = requests.patch(
         f'https://api.ynab.com/v1/budgets/{BUDGET_ID}/transactions',

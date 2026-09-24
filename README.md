@@ -16,7 +16,7 @@ Uncategorized transactions will attempt to be matched against all of your spendi
 
 > The upstream project restricts matching to Category-Groups prefixed with `[Auto]`, so you opt in specific categories one at a time. This fork removes that restriction and makes all of your spending categories eligible by default. If you'd rather opt in categories individually instead, restore the `[Auto]`-prefix filter in `ynab.py`'s `get_categories()`.
 
-Transactions that have been auto-categorized are marked with a blue flag.
+Transactions that have been auto-categorized are flagged so you can spot them at a glance: **blue** for a category that was blank and got filled in, **purple** for a category that already existed and got overridden (only after two independent Claude calls agree), and **green** for a refund/credit that got matched to the category of the charge it's offsetting (see `match_refund_categories()` in `main.py`).
 
 ## Setup
 
